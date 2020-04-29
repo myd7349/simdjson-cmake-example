@@ -1,0 +1,11 @@
+# Ignore everything
+*
+
+# But not these files...
+!.github/workflows/
+!.gitignore
+!print_json.cpp
+!print_json_deprecated.cpp
+!CMakeLists.txt
+!CMakeSettings.json
+!README.md

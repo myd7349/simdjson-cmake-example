@@ -1,0 +1,79 @@
+name: vcpkg
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  build:
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    steps:
+      - name: Cloing ${{ github.repository }}...
+        uses: actions/checkout@v2
+        with:
+          path: example
+
+      - name: Cloning vcpkg...
+        uses: actions/checkout@v2
+        with:
+          repository: microsoft/vcpkg
+          path: vcpkg
+
+      - name: Bootstrap vcpkg on ${{ runner.os }}...
+        if: ${{ runner.os == 'Linux' || runner.os == 'macOS' }}
+        run: |
+          pushd vcpkg
+          ./bootstrap-vcpkg.sh
+
+      - name: Bootstrap vcpkg on ${{ runner.os }}...
+        if: ${{ runner.os == 'Windows' }}
+        run: |
+          pushd vcpkg
+          .\bootstrap-vcpkg.bat
+
+      - name: Installing simdjson through vcpkg on ${{ runner.os }}...
+        if: ${{ runner.os == 'Linux' }}
+        run: |
+          ${{ github.workspace }}/vcpkg/vcpkg install simdjson:x64-linux
+
+      - name: Installing simdjson through vcpkg on ${{ runner.os }}...
+        if: ${{ runner.os == 'macOS' }}
+        run: |
+          ${{ github.workspace }}/vcpkg/vcpkg install simdjson:x64-osx
+
+      - name: Installing simdjson through vcpkg on ${{ runner.os }}...
+        if: ${{ runner.os == 'Windows' }}
+        run: |
+          ${{ github.workspace }}/vcpkg/vcpkg install simdjson:x64-windows
+
+      - name: Building example on ${{ runner.os }}...
+        if: ${{ runner.os == 'Linux' || runner.os == 'macOS' }}
+        run: |
+          pushd example
+          mkdir build
+          pushd build
+          cmake .. -DCMAKE_TOOLCHAIN_FILE='${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake' -DSANITIZE_ADDRESS=ON -DSANITIZE_UNDEFINED=ON
+          make print_json
+          ./print_json ../CMakeSettings.json
+          popd
+          popd
+
+      - name: Building example on ${{ runner.os }}...
+        if: ${{ runner.os == 'Windows' }}
+        run: |
+          pushd example
+          mkdir build
+          pushd build
+          cmake .. -G "Visual Studio 16 2019" -A x64 -DCMAKE_TOOLCHAIN_FILE="${{ github.workspace }}\vcpkg\scripts\buildsystems\vcpkg.cmake" -DVCPKG_TARGET_TRIPLET=x64-windows -DCMAKE_GENERATOR_PLATFORM=x64
+          cmake --build . --config Release --target print_json
+          .\Release\print_json.exe ..\CMakeSettings.json
+          popd
+          popd
