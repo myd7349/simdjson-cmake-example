@@ -4,9 +4,11 @@ on:
   push:
     branches:
       - master
+      - ci
   pull_request:
     branches:
       - master
+      - ci
 
 jobs:
   build:
@@ -14,7 +16,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ ubuntu-latest, macos-latest, windows-latest ]
     steps:
       - name: Cloing ${{ github.repository }}...
         uses: actions/checkout@v2
