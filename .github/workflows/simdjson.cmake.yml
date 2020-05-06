@@ -71,7 +71,7 @@ jobs:
           pushd build
           Get-Location
           echo ${{ github.workspace }}
-          cmake .. -G "Visual Studio 16 2019" -A x64 --debug-find -DCMAKE_PREFIX_PATH="${{ github.workspace }}\simdjson\build\install"
+          cmake .. -G "Visual Studio 16 2019" -A x64 --debug-find -DCMAKE_PREFIX_PATH="${{ github.workspace }}\simdjson\build\install" -DMSVC_USE_STATIC_CRT=ON
           cmake --build . --config Release --target print_json
           .\Release\print_json.exe ..\CMakeSettings.json
           popd
