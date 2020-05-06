@@ -45,7 +45,7 @@ jobs:
           mkdir build
           pushd build
           cmake .. -G "Visual Studio 16 2019" -A x64 -DCMAKE_INSTALL_PREFIX=install
-          cmake --build . --target install
+          cmake --build . --config Release --target install
           popd
           popd
 
