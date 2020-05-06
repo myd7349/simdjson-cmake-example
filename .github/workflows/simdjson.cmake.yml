@@ -59,6 +59,7 @@ jobs:
           echo ${{ github.workspace }}
           cmake .. -DCMAKE_PREFIX_PATH='${{ github.workspace }}/simdjson/build/install'
           make print_json
+          if [[ "$OSTYPE" == "darwin"* ]]; then cp '${{ github.workspace }}/simdjson/build/install/lib/libsimdjson.dylib' ./; fi;
           ./print_json ../CMakeSettings.json
           popd
           popd
@@ -83,3 +84,6 @@ jobs:
 # [Workflow syntax for GitHub Actions](https://help.github.com/en/actions/reference/workflow-syntax-for-github-actions)
 # [Context and expression syntax for GitHub Actions](https://help.github.com/en/actions/reference/context-and-expression-syntax-for-github-actions)
 # [starter-workflows/ci/python-app.yml](https://github.com/actions/starter-workflows/blob/master/ci/python-app.yml)
+# [dyld: Library not loaded … Reason: Image not found](https://stackoverflow.com/questions/17703510/dyld-library-not-loaded-reason-image-not-found)
+# https://github.com/barisione/clang-format-hooks/blob/master/git-pre-commit-format#L34-L42
+# [How to detect the OS from a Bash script?](https://stackoverflow.com/questions/394230/how-to-detect-the-os-from-a-bash-script)
