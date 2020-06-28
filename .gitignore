@@ -4,6 +4,7 @@
 # But not these files...
 !.github/workflows/
 !.gitignore
+!create_empty_commit.sh
 !print_json.cpp
 !print_json_deprecated.cpp
 !CMakeLists.txt
