@@ -61,7 +61,7 @@ jobs:
           echo ${{ github.workspace }}
           cmake .. -DCMAKE_PREFIX_PATH='${{ github.workspace }}/simdjson/build/install'
           make print_json
-          if [[ "$OSTYPE" == "darwin"* ]]; then cp '${{ github.workspace }}/simdjson/build/install/lib/*.dylib' ./; fi;
+          if [[ "$OSTYPE" == "darwin"* ]]; then cp ${{ github.workspace }}/simdjson/build/install/lib/*.dylib ./; fi;
           ./print_json ../CMakeSettings.json
           popd
           popd
@@ -89,3 +89,4 @@ jobs:
 # [dyld: Library not loaded … Reason: Image not found](https://stackoverflow.com/questions/17703510/dyld-library-not-loaded-reason-image-not-found)
 # https://github.com/barisione/clang-format-hooks/blob/master/git-pre-commit-format#L34-L42
 # [How to detect the OS from a Bash script?](https://stackoverflow.com/questions/394230/how-to-detect-the-os-from-a-bash-script)
+# [Copy all files with a certain extension from all subdirectories](https://stackoverflow.com/questions/15617016/copy-all-files-with-a-certain-extension-from-all-subdirectories)
