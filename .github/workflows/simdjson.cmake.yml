@@ -61,7 +61,7 @@ jobs:
           echo ${{ github.workspace }}
           cmake .. -DCMAKE_PREFIX_PATH='${{ github.workspace }}/simdjson/build/install'
           make print_json
-          if [[ "$OSTYPE" == "darwin"* ]]; then cp '${{ github.workspace }}/simdjson/build/install/lib/libsimdjson.dylib' ./; fi;
+          if [[ "$OSTYPE" == "darwin"* ]]; then cp '${{ github.workspace }}/simdjson/build/install/lib/*.dylib' ./; fi;
           ./print_json ../CMakeSettings.json
           popd
           popd
