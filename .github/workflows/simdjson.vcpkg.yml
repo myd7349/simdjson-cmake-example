@@ -41,21 +41,6 @@ jobs:
           pushd vcpkg
           .\bootstrap-vcpkg.bat
 
-      - name: Installing simdjson through vcpkg on ${{ runner.os }}...
-        if: ${{ runner.os == 'Linux' }}
-        run: |
-          ${{ github.workspace }}/vcpkg/vcpkg install simdjson:x64-linux
-
-      - name: Installing simdjson through vcpkg on ${{ runner.os }}...
-        if: ${{ runner.os == 'macOS' }}
-        run: |
-          ${{ github.workspace }}/vcpkg/vcpkg install simdjson:x64-osx
-
-      - name: Installing simdjson through vcpkg on ${{ runner.os }}...
-        if: ${{ runner.os == 'Windows' }}
-        run: |
-          ${{ github.workspace }}/vcpkg/vcpkg install simdjson:x64-windows
-
       - name: Building example on ${{ runner.os }}...
         if: ${{ runner.os == 'Linux' || runner.os == 'macOS' }}
         run: |
