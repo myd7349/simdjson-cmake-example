@@ -10,15 +10,19 @@ on:
       - master
       - ci
 
+env:
+  BUILD_TYPE: Release
+
 jobs:
   build:
     name: ${{ matrix.os }}
     runs-on: ${{ matrix.os }}
     strategy:
+      fail-fast: false
       matrix:
         os: [ ubuntu-latest, macos-latest, windows-latest ]
     steps:
-      - name: Cloing ${{ github.repository }}...
+      - name: Cloning ${{ github.repository }}...
         uses: actions/checkout@v2
         with:
           path: example
@@ -30,26 +34,57 @@ jobs:
           path: simdjson
 
       - name: Configuring, building, installing simdjson on ${{ runner.os }}...
-        if: ${{ runner.os == 'Linux' || runner.os == 'macOS' }}
+        shell: cmake -P {0}
         run: |
-          pushd simdjson
-          mkdir build
-          pushd build
-          cmake .. -DCMAKE_INSTALL_PREFIX=install
-          make install
-          popd
-          popd
+          if("${{ runner.os }}" STREQUAL "Linux" OR "${{ runner.os }}" STREQUAL "macOS")
+            execute_process(
+              COMMAND mkdir ./simdjson/build/install
+              COMMAND "${CMAKE_COMMAND}"
+                -S ./simdjson
+                -B ./simdjson/build
+                -D CMAKE_BUILD_TYPE=$ENV{BUILD_TYPE}
+                -D CMAKE_INSTALL_PREFIX=./simdjson/build/install
+              COMMAND popd
+              COMMAND popd
+              RESULT_VARIABLE result
+              ERROR_VARIABLE error_message
+            )
 
-      - name: Configuring, building, installing simdjson on ${{ runner.os }}...
-        if: ${{ runner.os == 'Windows' }}
-        run: |
-          pushd simdjson
-          mkdir build
-          pushd build
-          cmake .. -G "Visual Studio 16 2019" -A x64 -DCMAKE_INSTALL_PREFIX=install
-          cmake --build . --config Release --target install
-          popd
-          popd
+            if(NOT result EQUAL 0)
+              message(FATAL_ERROR "CMake configuration error(${result}): ${error_message}.")
+            endif()
+          elseif("${{ runner.os }}" STREQUAL "Windows")
+            execute_process(
+              COMMAND mkdir .\simdjson\build\install
+              COMMAND "${CMAKE_COMMAND}"
+                -S .\simdjson
+                -B .\simdjson\build
+                -D CMAKE_BUILD_TYPE=$ENV{BUILD_TYPE}
+                -D CMAKE_INSTALL_PREFIX=.\simdjson\build\install
+                -G "Visual Studio 16 2019"
+                -A x64
+              RESULT_VARIABLE result
+              ERROR_VARIABLE error_message
+            )
+
+            if(NOT result EQUAL 0)
+              message(FATAL_ERROR "CMake configuration error(${result}): ${error_message}.")
+            endif()
+          else()
+            message(FATAL_ERROR "Unexpected runner OS: ${{ runner.os }}.")
+          endif()
+
+          execute_process(
+            COMMAND "${CMAKE_COMMAND}"
+              --build .
+              --target install
+            RESULT_VARIABLE result
+            ERROR_VARIABLE error_message
+          )
+
+          if(NOT result EQUAL 0)
+            message(FATAL_ERROR "CMake build error(${result}): ${error_message}.")
+          endif()
 
       - name: Building example on ${{ runner.os }}...
         if: ${{ runner.os == 'Linux' || runner.os == 'macOS' }}
@@ -90,3 +125,4 @@ jobs:
 # https://github.com/barisione/clang-format-hooks/blob/master/git-pre-commit-format#L34-L42
 # [How to detect the OS from a Bash script?](https://stackoverflow.com/questions/394230/how-to-detect-the-os-from-a-bash-script)
 # [Copy all files with a certain extension from all subdirectories](https://stackoverflow.com/questions/15617016/copy-all-files-with-a-certain-extension-from-all-subdirectories)
+# https://github.com/cycfi/elements/blob/master/.github/workflows/build.yml
