@@ -1,6 +1,6 @@
 {
   "name": "simdjson-cmake-example",
-  "version-string": "0.0.4",
+  "version-semver": "0.9.7",
   "dependencies": [
     "simdjson"
   ]
